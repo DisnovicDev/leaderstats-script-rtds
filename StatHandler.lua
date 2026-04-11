@@ -1,14 +1,20 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local changeStatEvent = Instance.new("RemoteEvent")
-changeStatEvent.Name = "ChangeStatEvent"
-changeStatEvent.Parent = ReplicatedStorage
+local remote = Instance.new("RemoteEvent")
+remote.Name = "ApplyFakeLag"
+remote.Parent = game.ReplicatedStorage
 
-changeStatEvent.OnServerEvent:Connect(function(player, statName, amount)
-    local leaderstats = player:FindFirstChild("leaderstats")
-    if leaderstats then
-        local stat = leaderstats:FindFirstChild(statName)
-        if stat then
-            stat.Value = stat.Value + amount
-        end
-    end
+remote.OnServerEvent:Connect(function(player, target, delayMs)
+	if not target.Character then return end
+	
+	local root = target.Character:FindFirstChild("HumanoidRootPart")
+	if not root then return end
+	
+	local duration = 2
+	local interval = delayMs / 1000
+	
+	local lastPos = root.Position
+	
+	for i = 1, duration / interval do
+		task.wait(interval)
+		root.CFrame = CFrame.new(lastPos)
+	end
 end)
